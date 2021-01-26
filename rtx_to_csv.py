@@ -1,16 +1,17 @@
 #!/usr/bin/python
 
 import sys, getopt
+import xml.etree.ElementTree as ET
+import pandas as pd
+
 
 def rtx_convert(input, output):
     #use pandas to convert
-    import xml.etree.ElementTree as ET
     tree = ET.parse(input)
     root = tree.getroot()
     ns = {'rtx':'http://schema.redwood.com/report/rtx.xsd'}
 
     #create new data frame
-    import pandas as pd
     df:pd.DataFrame = pd.DataFrame()
 
     # use XPATH for column names: "/table/metadata/columns/column/name" undernamespace 'rtx'

@@ -55,6 +55,18 @@ def rtxV_to_df_list(root, li:list()):
         result.append((i, rtxValues))
     return result
 
+def rtxV_file_to_df_list(fn, li:list()):
+    #use pandas to convert
+    tree = ET.parse(fn)
+    root = tree.getroot()
+
+    result = list()
+    for i in li:
+        rtxRows = root.findall("rtx:data/rtx:r/rtx:v[" + str(i+1) + "]", ns)
+        rtxValues = pd.Series((rtxV.text for rtxV in rtxRows))
+        result.append((i, rtxValues))
+    return result
+
 def rtx_convert(input, output):
     #use pandas to convert
     tree = ET.parse(input)
@@ -69,8 +81,8 @@ def rtx_convert(input, output):
 
     columns = len(df.columns)
 
-    # #timer for running
-    # start_time = time.time()
+    #timer for running
+    start_time = time.time()
 
 # ### use threadpool executor
 # ### use XPATH for rtx values "/table/data/r/v" undernamespace 'rtx'
@@ -84,8 +96,8 @@ def rtx_convert(input, output):
 #         column, rtxRows = futures[i].result()
 #         df.iloc[:, column]=rtxRows
 
-    # print("--- ThreadPoolExecutor used --- %3.6f seconds ---" % (time.time() - start_time))
-    # start_time = time.time()
+#     print("--- ThreadPoolExecutor used --- %3.6f seconds ---" % (time.time() - start_time))
+#     start_time = time.time()
 
 # ### user ProcessingPool and pickler & unpickler
 #     res = ProcessingPool(4).map(rtxV_to_df, itertools.repeat(root,columns), range(0, columns))
@@ -94,24 +106,41 @@ def rtx_convert(input, output):
 #         # print(type(rtxRows))
 #         df.iloc[:, column]=rtxRows
 
-# # ### user ProcessingPool and WITH optmized CPU core usage
+# ### user ProcessingPool and WITH optmized CPU core usage
 #     #minimum 6 per each cpu core run , as pickler is expensive
-#     chunksize:int = columns / os.cpu_count()
-#     if chunksize < 6:
-#         chunksize = 6
+#     chunksize:int = max(columns / os.cpu_count(), 6)
 #     # split full list by chunk
 #     l = list(range(0, columns))
 #     chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 
 #     # call processingpool for each chunk
-#     result_list = ProcessingPool(os.cpu_count()).map(rtxV_to_df_list, itertools.repeat(root,len(chunks)), chunks)
+#     result_list = ProcessingPool(int(min(os.cpu_count()/2, len(chunks)))).map(rtxV_to_df_list, itertools.repeat(root,len(chunks)), chunks)
 #     for result in result_list:
 #         for column, rtxRows in result:
 #             # print(column)
 #             # print(type(rtxRows)) 
 #             df.iloc[:, column]=rtxRows
 
-    # print("--- ProcessingPool used --- %3.6f seconds ---" % (time.time() - start_time))
-    # start_time = time.time()
+#     print("--- ProcessingPool pickle & unpickle used --- %3.6f seconds ---" % (time.time() - start_time))
+#     start_time = time.time()
+
+
+# ### user ProcessingPool and WITH optmized CPU core usage - FILE NAME USED
+#     #minimum 6 per each cpu core run , as pickler is expensive
+#     chunksize:int = max(columns / os.cpu_count(), 6)
+#     # split full list by chunk
+#     l = list(range(0, columns))
+#     chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 
+#     # call processingpool for each chunk
+#     result_list = ProcessingPool(int(min(os.cpu_count()/2, len(chunks)))).map(rtxV_file_to_df_list, itertools.repeat(input, len(chunks)), chunks)
+#     for result in result_list:
+#         for column, rtxRows in result:
+#             # print(column)
+#             # print(type(rtxRows)) 
+#             df.iloc[:, column]=rtxRows
+
+#     print("--- ProcessingPool FN used --- %3.6f seconds ---" % (time.time() - start_time))
+#     start_time = time.time()
+
 
 # #single thread
     for i in range(0, columns):

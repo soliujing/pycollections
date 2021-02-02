@@ -2,14 +2,13 @@
 # %%
 
 import copyreg
-import io
+import io, os
 import itertools
 import sys, getopt, time
 import xml.etree.ElementTree as ET
 # from lxml import etree as ET
 import pandas as pd
 import concurrent.futures
-import os, threading
 from pathos.multiprocessing import ProcessingPool
 
 ns = {'rtx':'http://schema.redwood.com/report/rtx.xsd'}
@@ -113,7 +112,7 @@ def rtx_convert(input, output):
 #     l = list(range(0, columns))
 #     chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 
 #     # call processingpool for each chunk
-#     result_list = ProcessingPool(int(min(os.cpu_count()/2, len(chunks)))).map(rtxV_to_df_list, itertools.repeat(root,len(chunks)), chunks)
+#     result_list = ProcessingPool(len(chunks)).map(rtxV_to_df_list, itertools.repeat(root,len(chunks)), chunks)
 #     for result in result_list:
 #         for column, rtxRows in result:
 #             # print(column)
@@ -124,30 +123,30 @@ def rtx_convert(input, output):
 #     start_time = time.time()
 
 
-# ### user ProcessingPool and WITH optmized CPU core usage - FILE NAME USED
-#     #minimum 6 per each cpu core run , as pickler is expensive
-#     chunksize:int = max(columns / os.cpu_count(), 6)
-#     # split full list by chunk
-#     l = list(range(0, columns))
-#     chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 
-#     # call processingpool for each chunk
-#     result_list = ProcessingPool(int(min(os.cpu_count()/2, len(chunks)))).map(rtxV_file_to_df_list, itertools.repeat(input, len(chunks)), chunks)
-#     for result in result_list:
-#         for column, rtxRows in result:
-#             # print(column)
-#             # print(type(rtxRows)) 
-#             df.iloc[:, column]=rtxRows
+### user ProcessingPool and WITH optmized CPU core usage - FILE NAME USED
+    #minimum 6 per each cpu core run , as pickler is expensive
+    chunksize:int = max(columns / os.cpu_count(), 6)
+    # split full list by chunk
+    l = list(range(0, columns))
+    chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 
+    # call processingpool for each chunk
+    result_list = ProcessingPool(len(chunks)).map(rtxV_file_to_df_list, itertools.repeat(input, len(chunks)), chunks)
+    for result in result_list:
+        for column, rtxRows in result:
+            # print(column)
+            # print(type(rtxRows)) 
+            df.iloc[:, column]=rtxRows
 
 #     print("--- ProcessingPool FN used --- %3.6f seconds ---" % (time.time() - start_time))
 #     start_time = time.time()
 
 
-# #single thread
-    for i in range(0, columns):
-        column, rtxRows = rtxV_to_df(root, i)
-        df.iloc[:, column]=rtxRows
-        # rtxRows = root.findall("rtx:data/rtx:r/rtx:v[" + str(i+1) + "]", ns)
-        # df.iloc[:, i]=pd.Series((rtxV.text for rtxV in rtxRows))
+# # #single thread
+#     for i in range(0, columns):
+#         column, rtxRows = rtxV_to_df(root, i)
+#         df.iloc[:, column]=rtxRows
+#         # rtxRows = root.findall("rtx:data/rtx:r/rtx:v[" + str(i+1) + "]", ns)
+#         # df.iloc[:, i]=pd.Series((rtxV.text for rtxV in rtxRows))
 
     # print("--- single thread used --- %3.6f seconds ---" % (time.time() - start_time))
     # start_time = time.time()

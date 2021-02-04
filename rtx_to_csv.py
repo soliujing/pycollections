@@ -125,7 +125,7 @@ def rtx_convert(input, output):
 
 ### user ProcessingPool and WITH optmized CPU core usage - FILE NAME USED
     #minimum 6 per each cpu core run , as pickler is expensive
-    chunksize:int = max(columns / os.cpu_count(), 6)
+    chunksize:int = int(max(columns / os.cpu_count(), 6))
     # split full list by chunk
     l = list(range(0, columns))
     chunks = [l[i:i + chunksize] for i in range(0, len(l), chunksize)] 

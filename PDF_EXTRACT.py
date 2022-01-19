@@ -1,4 +1,6 @@
 
+import shutil
+import sys
 import PyPDF2,os
 
 def getAttachments(reader):
@@ -27,9 +29,21 @@ FILE_PATH_HOME = expanduser("~")
 FILE_PATH_PWD = FILE_PATH_HOME + "/.CITY_REJ_PWD"
 
 FILE_PATH_WORK = FILE_PATH_HOME + "/Downloads/"
+
+WorkisExist = os.path.exists(FILE_PATH_WORK)
+if not WorkisExist:
+	sys.exit("Error: work folder does not exist !!!")
+
 FILE_PATH_OUT = FILE_PATH_WORK + "OUTPUT/"
 FILE_PATH_TEMP = FILE_PATH_WORK + ".TEMP/"
 
+isExist = os.path.exists(FILE_PATH_OUT)
+if not isExist:
+    os.makedirs(FILE_PATH_OUT)
+
+isExist = os.path.exists(FILE_PATH_TEMP)
+if not isExist:
+    os.makedirs(FILE_PATH_TEMP)
 
 with open(FILE_PATH_PWD) as f:
     lines = f.read() 
@@ -63,3 +77,7 @@ for each_file in files:
 					for fName, fData in dictionary.items():
 						with open(FILE_PATH_OUT+fName, 'wb') as outfile:
 							outfile.write(fData)
+
+isExist = os.path.exists(FILE_PATH_TEMP)
+if isExist:
+    shutil.rmtree(FILE_PATH_TEMP)

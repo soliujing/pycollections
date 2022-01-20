@@ -36,12 +36,12 @@ files = [f for f in os.listdir('.') if os.path.isfile(f)]
 files = filter(lambda f: f.endswith(('.pdf','.PDF')), files)
 
 # %%
-from pathlib import Path
+# from pathlib import Path
 for each_file in files:
 	ENCRYPTED_FILE_PATH = FILE_PATH_WORK + each_file
 	with pikepdf.Pdf.open(ENCRYPTED_FILE_PATH, password=PASSWORD) as pdf:
 		##### attach new file to test multiple attachments
-		# filespec = pikepdf.AttachedFileSpec.from_filepath(pdf, Path('/Users/jing_liu/Downloads/PDF_EXTRACT.py'))
+		# filespec = pikepdf.AttachedFileSpec.from_filepath(pdf, os.expanduser('~/Downloads/PDF_EXTRACT.py'))
 		# pdf.attachments['PDF_EXTRACT.py'] = filespec
 
 		for file_tag, file_details in pdf.attachments.items():

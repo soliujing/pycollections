@@ -1,7 +1,6 @@
 
 import shutil
-import sys
-import PyPDF2,os
+import PyPDF2,os,pikepdf
 
 def getAttachments(reader):
 	"""
@@ -26,16 +25,19 @@ def getAttachments(reader):
 from os.path import expanduser
 FILE_PATH_HOME = expanduser("~")
 
+###### BASIC CONFIG ######
 FILE_PATH_PWD = FILE_PATH_HOME + "/.CITY_REJ_PWD"
-
 FILE_PATH_WORK = FILE_PATH_HOME + "/Downloads/"
-
-WorkisExist = os.path.exists(FILE_PATH_WORK)
-if not WorkisExist:
-	sys.exit("Error: work folder does not exist !!!")
-
 FILE_PATH_OUT = FILE_PATH_WORK + "OUTPUT/"
 FILE_PATH_TEMP = FILE_PATH_WORK + ".TEMP/"
+
+isExist = os.path.exists(FILE_PATH_PWD)
+if not isExist:
+	exit("Error: password file [~/.CITY_REJ_PWD] does not exist !!!")
+
+isExist = os.path.exists(FILE_PATH_WORK)
+if not isExist:
+	exit("Error: work folder does not exist !!!")
 
 isExist = os.path.exists(FILE_PATH_OUT)
 if not isExist:
@@ -45,11 +47,12 @@ isExist = os.path.exists(FILE_PATH_TEMP)
 if not isExist:
     os.makedirs(FILE_PATH_TEMP)
 
+# read password
 with open(FILE_PATH_PWD) as f:
     lines = f.read() 
     PASSWORD = lines.split('\n', 1)[0]
 
-
+# get list of pdf files
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
 files = filter(lambda f: f.endswith(('.pdf','.PDF')), files)
 
@@ -66,18 +69,21 @@ for each_file in files:
 					with open(fName, 'wb') as outfile:
 						outfile.write(fData)
 			except NotImplementedError:
-				command=f"qpdf --password='{PASSWORD}' --decrypt '{ENCRYPTED_FILE_PATH}' '{FILE_PATH_TEMP}{each_file}';"
-				os.system(command)            
+				#decrypt as temp file
+				# command=f"qpdf --password='{PASSWORD}' --decrypt '{ENCRYPTED_FILE_PATH}' '{FILE_PATH_TEMP}{each_file}';"
+				# os.system(command)    
+				with pikepdf.Pdf.open(ENCRYPTED_FILE_PATH, password=PASSWORD) as pdf:
+					pdf.save(FILE_PATH_TEMP+each_file)    
+
 				with open(FILE_PATH_TEMP+each_file, mode='rb') as fp:
 					reader = PyPDF2.PdfFileReader(fp)
-					# print(f"Number of page: {reader.getNumPages()}")
-				# print(f"Number of page: {reader.getNumPages()}")
 					dictionary = getAttachments(reader)
-					# print(dictionary)
+					# save attachments to OUTPUT folder
 					for fName, fData in dictionary.items():
 						with open(FILE_PATH_OUT+fName, 'wb') as outfile:
 							outfile.write(fData)
 
+#clear temp files
 isExist = os.path.exists(FILE_PATH_TEMP)
 if isExist:
     shutil.rmtree(FILE_PATH_TEMP)

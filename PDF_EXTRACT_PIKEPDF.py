@@ -20,16 +20,16 @@ if not isExist:
 
 isExist = os.path.exists(FILE_PATH_OUT)
 if not isExist:
-    os.makedirs(FILE_PATH_OUT)
+	os.makedirs(FILE_PATH_OUT)
 
 isExist = os.path.exists(FILE_PATH_TEMP)
 if not isExist:
-    os.makedirs(FILE_PATH_TEMP)
+	os.makedirs(FILE_PATH_TEMP)
 
 # read password
 with open(FILE_PATH_PWD) as f:
-    lines = f.read() 
-    PASSWORD = lines.split('\n', 1)[0]
+	lines = f.read() 
+	PASSWORD = lines.split('\n', 1)[0]
 
 # get list of pdf files
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -41,7 +41,7 @@ for each_file in files:
 	ENCRYPTED_FILE_PATH = FILE_PATH_WORK + each_file
 	with pikepdf.Pdf.open(ENCRYPTED_FILE_PATH, password=PASSWORD) as pdf:
 		##### attach new file to test multiple attachments
-		# filespec = pikepdf.AttachedFileSpec.from_filepath(pdf, expanduser('~/Downloads/PDF_EXTRACT.py'))
+		# filespec = pikepdf.AttachedFileSpec.from_filepath(pdf, os.expanduser('~/Downloads/PDF_EXTRACT.py'))
 		# pdf.attachments['PDF_EXTRACT.py'] = filespec
 
 		for file_tag, file_details in pdf.attachments.items():

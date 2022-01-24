@@ -41,16 +41,16 @@ if not isExist:
 
 isExist = os.path.exists(FILE_PATH_OUT)
 if not isExist:
-    os.makedirs(FILE_PATH_OUT)
+	os.makedirs(FILE_PATH_OUT)
 
 isExist = os.path.exists(FILE_PATH_TEMP)
 if not isExist:
-    os.makedirs(FILE_PATH_TEMP)
+	os.makedirs(FILE_PATH_TEMP)
 
 # read password
 with open(FILE_PATH_PWD) as f:
-    lines = f.read() 
-    PASSWORD = lines.split('\n', 1)[0]
+	lines = f.read() 
+	PASSWORD = lines.split('\n', 1)[0]
 
 # get list of pdf files
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -86,4 +86,4 @@ for each_file in files:
 #clear temp files
 isExist = os.path.exists(FILE_PATH_TEMP)
 if isExist:
-    shutil.rmtree(FILE_PATH_TEMP)
+	shutil.rmtree(FILE_PATH_TEMP)

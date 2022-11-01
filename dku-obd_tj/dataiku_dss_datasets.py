@@ -5,11 +5,7 @@ import dataiku
 import pandas as pd, numpy as np
 from dataiku import pandasutils as pdu
 import warnings
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-from urllib3.exceptions import InsecureRequestWarning
-from urllib3 import disable_warnings
-disable_warnings(InsecureRequestWarning)
+warnings.simplefilter(action='ignore')
 
 # Read recipe inputs
 UMS_input = dataiku.Dataset("UMS_input")

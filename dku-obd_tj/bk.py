@@ -30,13 +30,17 @@ def get_userid():
 # create a callback that adds a number in a random location
 def update_call():
     global update_click
-    if update_click == False:
-        update_click = True
-        btn_y = Button(label="YES")
-        btn_y.on_click(btn_y_call)
-        btn_n = Button(label="NO!")
-        btn_n.on_click(btn_n_call)
-        doc.add_root(row([btn_y, btn_n]))
+    if len(source_dt.selected.indices)>0:
+        if update_click == False:
+            update_click = True
+            btn_y = Button(label="YES")
+            btn_y.on_click(btn_y_call)
+            btn_n = Button(label="NO!")
+            btn_n.on_click(btn_n_call)
+            doc.add_root(row([btn_y, btn_n]))
+    else:
+        print("update fail, nothing selected")
+        
     
 def btn_y_call():
     global update_click
@@ -62,7 +66,7 @@ def btn_n_call():
     
 def doc_init():
     doc.clear()
-    global doc, source_dt
+    global source_dt
     source_dt = ColumnDataSource(data)
     columns = [
         TableColumn(field=col, title=col) for col in data.columns
